@@ -78,8 +78,11 @@ function makePlayer() {
     maxHp: 100,
     shotCd: 0,
     charge: 0,
-    maxCharge: 5,
+    maxCharge: 2,
     chargeHeld: false,
+    pendingChargeShots: 0,
+    pendingChargeDelay: 0,
+    pendingChargeRatio: 0,
     invuln: 0,
   };
 }
@@ -140,7 +143,7 @@ function spawnPhase(phase) {
 
   const isBoss = phase % 5 === 0;
   if (isBoss) {
-    const hp = 220 + phase * 40;
+    const hp = 300 + phase * 55;
     state.boss = {
       x: canvas.width / 2,
       y: 100,
@@ -154,10 +157,10 @@ function spawnPhase(phase) {
       phase,
     };
   } else {
-    const cols = 7;
+    const cols = 8;
     const maxRows = 6;
-    const enemyCount = Math.min(cols * maxRows, 14 + phase * 2);
-    const spacingX = 58;
+    const enemyCount = Math.min(cols * maxRows, 18 + phase * 2);
+    const spacingX = 50;
     const spacingY = 44;
     const totalW = (cols - 1) * spacingX;
     const startX = canvas.width / 2 - totalW / 2;
@@ -277,12 +280,23 @@ function update(dt) {
       const chargeRatio = p.charge / p.maxCharge;
       shootCharge(chargeRatio);
       if (chargeRatio >= 1) {
-        shootCharge(chargeRatio, 10);
+        p.pendingChargeShots = 1;
+        p.pendingChargeDelay = 0.09;
+        p.pendingChargeRatio = chargeRatio;
       }
       p.shotCd = Math.max(p.shotCd, 0.16);
     }
     p.chargeHeld = false;
     p.charge = 0;
+  }
+
+  if (p.pendingChargeShots > 0) {
+    p.pendingChargeDelay -= dt;
+    if (p.pendingChargeDelay <= 0) {
+      shootCharge(p.pendingChargeRatio, 10);
+      p.pendingChargeShots -= 1;
+      p.pendingChargeDelay = 0.09;
+    }
   }
 
   for (const e of state.enemies) {
@@ -312,7 +326,7 @@ function update(dt) {
     }
 
     if (Math.random() < e.fireChance * dt * 3.8) {
-      state.enemyBullets.push({ x: e.x, y: e.y + e.h / 2, w: 8, h: 14, vy: getEnemyBulletSpeed(state.phase), dmg: 8 });
+      state.enemyBullets.push({ x: e.x, y: e.y + e.h / 2, w: 8, h: 14, vy: getEnemyBulletSpeed(state.phase), dmg: 6 });
     }
   }
 
@@ -327,32 +341,32 @@ function update(dt) {
     b.fireCd -= dt;
     b.volleyCd -= dt;
     if (b.fireCd <= 0) {
-      b.fireCd = Math.max(0.12, 0.48 - b.phase * 0.01);
-      for (let i = -2; i <= 2; i++) {
+      b.fireCd = Math.max(0.08, 0.4 - b.phase * 0.012);
+      for (let i = -3; i <= 3; i++) {
         state.enemyBullets.push({
           x: b.x + i * 32,
           y: b.y + b.h / 2 - 8,
           w: 9,
           h: 16,
-          vy: getEnemyBulletSpeed(b.phase) + 10,
-          vx: i * 42,
-          dmg: 7,
+          vy: getEnemyBulletSpeed(b.phase) + 20,
+          vx: i * 46,
+          dmg: 8,
         });
       }
     }
     if (b.volleyCd <= 0) {
-      b.volleyCd = Math.max(0.9, 1.35 - b.phase * 0.015);
-      for (let i = 0; i < 16; i++) {
-        const ang = (Math.PI * 2 * i) / 16;
-        const spd = 150 + b.phase * 4;
+      b.volleyCd = Math.max(0.6, 1.05 - b.phase * 0.02);
+      for (let i = 0; i < 20; i++) {
+        const ang = (Math.PI * 2 * i) / 20;
+        const spd = 190 + b.phase * 5;
         state.enemyBullets.push({
           x: b.x,
           y: b.y + 16,
           w: 8,
           h: 8,
           vx: Math.cos(ang) * spd,
-          vy: Math.sin(ang) * spd + 120,
-          dmg: 6,
+          vy: Math.sin(ang) * spd + 140,
+          dmg: 7,
         });
       }
     }
