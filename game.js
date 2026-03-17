@@ -337,7 +337,7 @@ function update(dt) {
     }
 
     if (Math.random() < e.fireChance * dt * 3.8) {
-      state.enemyBullets.push({ x: e.x, y: e.y + e.h / 2, w: 8, h: 14, vy: getEnemyBulletSpeed(state.phase), dmg: 6 });
+      state.enemyBullets.push({ x: e.x, y: e.y + e.h / 2, w: 8, h: 14, hitW: 12, hitH: 18, vy: getEnemyBulletSpeed(state.phase), dmg: 6 });
     }
   }
 
@@ -359,8 +359,8 @@ function update(dt) {
         state.enemyBullets.push({
           x: b.x + i * 32,
           y: b.y + b.h / 2 - 8,
-          w: 9,
-          h: 16,
+          w: 6,
+          h: 12,
           hitW: 6,
           hitH: 12,
           vy: getEnemyBulletSpeed(b.phase) + 20,
@@ -379,8 +379,8 @@ function update(dt) {
         state.enemyBullets.push({
           x: b.x,
           y: b.y + 16,
-          w: 8,
-          h: 8,
+          w: 6,
+          h: 6,
           hitW: 6,
           hitH: 6,
           vx: Math.cos(ang) * spd,
@@ -398,8 +398,8 @@ function update(dt) {
         state.enemyBullets.push({
           x: b.x,
           y: b.y,
-          w: 7,
-          h: 7,
+          w: 5,
+          h: 5,
           hitW: 5,
           hitH: 5,
           vx: Math.cos(ang) * spd,
@@ -471,7 +471,7 @@ function update(dt) {
 
     state.phase += 1;
     if (state.phase === 25) state.player.hp = state.player.maxHp;
-    else state.player.hp = clamp(state.player.hp + 16, 0, state.player.maxHp);
+    else state.player.hp = clamp(state.player.hp + 18, 0, state.player.maxHp);
     spawnPhase(state.phase);
   }
 }
