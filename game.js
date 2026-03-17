@@ -143,7 +143,7 @@ function spawnPhase(phase) {
 
   const isBoss = phase % 5 === 0;
   if (isBoss) {
-    const bossHpTable = { 5: 1000, 10: 5000, 15: 10000, 20: 8000, 25: 20000 };
+    const bossHpTable = { 5: 1000, 10: 5000, 15: 10000, 20: 6000, 25: 18000 };
     const hp = bossHpTable[phase] || (300 + phase * 55);
     const bossBase = {
       y: 100,
@@ -361,6 +361,8 @@ function update(dt) {
           y: b.y + b.h / 2 - 8,
           w: 9,
           h: 16,
+          hitW: 6,
+          hitH: 12,
           vy: getEnemyBulletSpeed(b.phase) + 20,
           vx: i * 46,
           dmg: lineDamage,
@@ -379,6 +381,8 @@ function update(dt) {
           y: b.y + 16,
           w: 8,
           h: 8,
+          hitW: 6,
+          hitH: 6,
           vx: Math.cos(ang) * spd,
           vy: Math.sin(ang) * spd + 140,
           dmg: volleyDamage,
@@ -396,6 +400,8 @@ function update(dt) {
           y: b.y,
           w: 7,
           h: 7,
+          hitW: 5,
+          hitH: 5,
           vx: Math.cos(ang) * spd,
           vy: Math.sin(ang) * spd + 120,
           dmg: 8,
@@ -465,7 +471,7 @@ function update(dt) {
 
     state.phase += 1;
     if (state.phase === 25) state.player.hp = state.player.maxHp;
-    else state.player.hp = clamp(state.player.hp + 14, 0, state.player.maxHp);
+    else state.player.hp = clamp(state.player.hp + 16, 0, state.player.maxHp);
     spawnPhase(state.phase);
   }
 }
