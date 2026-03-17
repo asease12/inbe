@@ -250,6 +250,20 @@ function damagePlayer(dmg) {
   }
 }
 
+function advancePhase() {
+  if (state.phase >= state.maxPhase) {
+    state.victory = true;
+    state.running = false;
+    message.textContent = "ALL 25 PHASE CLEAR! Spaceで再挑戦";
+    return;
+  }
+
+  state.phase += 1;
+  if (state.phase === 25) state.player.hp = state.player.maxHp;
+  else state.player.hp = clamp(state.player.hp + 15, 0, state.player.maxHp);
+  spawnPhase(state.phase);
+}
+
 function update(dt) {
   const p = state.player;
   p.shotCd = Math.max(0, p.shotCd - dt);
@@ -462,17 +476,7 @@ function update(dt) {
   const bossClear = hasBossWave && state.bosses.every((b) => b.hp <= 0);
 
   if ((waveClear || bossClear) && !state.gameOver) {
-    if (state.phase >= state.maxPhase) {
-      state.victory = true;
-      state.running = false;
-      message.textContent = "ALL 25 PHASE CLEAR! Spaceで再挑戦";
-      return;
-    }
-
-    state.phase += 1;
-    if (state.phase === 25) state.player.hp = state.player.maxHp;
-    else state.player.hp = clamp(state.player.hp + 18, 0, state.player.maxHp);
-    spawnPhase(state.phase);
+    advancePhase();
   }
 }
 
@@ -603,7 +607,12 @@ window.addEventListener("keydown", (e) => {
     state.paused = !state.paused;
     message.textContent = state.paused ? "PAUSED (Pで再開)" : "";
   }
-
+  
+  if ((e.code === "ShiftLeft" || e.code === "ShiftRight") && state.running && !state.paused && !state.gameOver && !state.victory) {
+    advancePhase();
+    e.preventDefault();
+  }
+  
   if (e.code === "Space" && (!state.running || state.gameOver || state.victory)) {
     resetGame();
   }
