@@ -78,7 +78,7 @@ function makePlayer() {
     maxHp: 100,
     shotCd: 0,
     charge: 0,
-    maxCharge: 2,
+    maxCharge: 1.5,
     chargeHeld: false,
     pendingChargeShots: 0,
     pendingChargeDelay: 0,
